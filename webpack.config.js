@@ -1,7 +1,7 @@
 /*
  * @Author: E-Dreamer
  * @Date: 2022-01-17 13:28:45
- * @LastEditTime: 2022-01-17 16:59:00
+ * @LastEditTime: 2022-01-18 13:25:48
  * @LastEditors: E-Dreamer
  * @Description:
  */
@@ -63,7 +63,7 @@ const config = {
         use: [
           // 'style-loader',
           MiniCssExtractPlugin.loader,
-           // 添加 loader
+          // 添加 loader
           'css-loader',
           'postcss-loader',
           'sass-loader',
@@ -77,13 +77,13 @@ const config = {
         generator: {
           // 输出文件位置以及文件名
           // [ext] 自带 "." 这个与 url-loader 配置不同
-          filename: "[name][hash:8][ext]"
+          filename: '[name][hash:8][ext]',
         },
         parser: {
           dataUrlCondition: {
-            maxSize: 50 * 1024 //超过50kb不转 base64
-          }
-        }
+            maxSize: 50 * 1024, //超过50kb不转 base64
+          },
+        },
       },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/i,
@@ -98,13 +98,19 @@ const config = {
           }
         }
       },
+      // {
+      //   test: /\.m?js$/,
+      //   // exclude: /(node_modules|bower_components)/,
+      //   use: {
+      //     loader: 'babel-loader'
+      //   },
+      // },
     ],
   },
   plugins: [
     //配置插件
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, 'public/index.html'),
-      title:'哈哈哈哈哈'
+      template: path.join(__dirname, 'public/index.html')
     }),
     // 自动清空打包目录
     new CleanWebpackPlugin(),
