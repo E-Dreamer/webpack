@@ -1,7 +1,7 @@
 /*
  * @Author: E-Dreamer
  * @Date: 2022-01-17 11:54:28
- * @LastEditTime: 2022-01-18 13:28:22
+ * @LastEditTime: 2022-01-18 14:10:43
  * @LastEditors: E-Dreamer
  * @Description: 
  */
@@ -35,3 +35,16 @@ class Author {
 
 
 module.exports = Author
+
+// 新增装饰器的使用
+@log('hi')
+class MyClass { }
+
+function log(text) {
+  return function(target) {
+    target.prototype.logger = () => `${text}，${target.name}`
+  }
+}
+
+const test = new MyClass()
+test.logger()

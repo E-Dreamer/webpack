@@ -1,7 +1,7 @@
 /*
  * @Author: E-Dreamer
  * @Date: 2022-01-17 13:28:45
- * @LastEditTime: 2022-01-18 13:25:48
+ * @LastEditTime: 2022-01-18 15:37:55
  * @LastEditors: E-Dreamer
  * @Description:
  */
@@ -9,8 +9,25 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 //mini-css-extract-plugin 2.5.0 会报错 MiniCssExtractPlugin is not constructor
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+// 构建结果分析
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+// 压缩css
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+//压缩js
+const TerserPlugin = require('terser-webpack-plugin');
+//会单独提取 CSS 并清除用不到的 CSS
+const PurgecssWebpackPlugin = require('purgecss-webpack-plugin')
+const glob = require('glob'); // 文件匹配模式
 
 const path = require('path')
+
+// 路径处理方法
+function resolve(dir){
+  return path.join(__dirname, dir);
+}
+const PATHS = {
+  src: resolve('src')
+}
 
 console.log('process.env.NODE_ENV=', process.env.NODE_ENV) // 打印环境变量
 
@@ -25,11 +42,24 @@ const config = {
     // publicPath: '/',
     // assetModuleFilename: 'assets/[hash][ext][query]'
   },
+  devtool: 'source-map',
   resolve: {
     //别名
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
+    //引入可不带扩展名
+    extensions: ['.ts','.js','.jsx', '.json', '.wasm'],
+    // 告诉 webpack 优先 src 目录下查找需要解析的文件，会大大节省查找时间
+    modules: [resolve('src'), 'node_modules'],
+  },
+  optimization: {
+    minimize: true,// 开启最小化
+    minimizer: [
+      // 添加 css 压缩配置
+      new OptimizeCssAssetsPlugin({}),
+      new TerserPlugin({})
+    ]
   },
   module: {
     rules: [
@@ -98,13 +128,13 @@ const config = {
           }
         }
       },
-      // {
-      //   test: /\.m?js$/,
-      //   // exclude: /(node_modules|bower_components)/,
-      //   use: {
-      //     loader: 'babel-loader'
-      //   },
-      // },
+      {
+        test: /\.m?js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: 'babel-loader'
+        },
+      },
     ],
   },
   plugins: [
@@ -117,6 +147,13 @@ const config = {
     new MiniCssExtractPlugin({
       // 添加插件
       filename: '[name].[hash:8].css',
+    }),
+    new BundleAnalyzerPlugin({
+      // analyzerMode: 'disabled',  // 不启动展示打包报告的http服务器
+      // generateStatsFile: true, // 是否生成stats.json文件
+    }),
+    new PurgecssWebpackPlugin({
+      paths: glob.sync(`${PATHS.src}/**/*`, {nodir: true})
     }),
   ],
   devServer: {
